@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                         "Accept": "application/vnd.linkedin.normalized+json+2.1"
                     },
                     "method": "GET",
-                    "mode": "cors"
-                });
+                    "mode": "cors",
+                }, {cache: "no-store"});
     
                 if (response.status === 403) {
                     document.getElementById('status').innerText = 'Session expired. Please enter a new session ID';
@@ -58,15 +58,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     
                 document.getElementById('status').innerText = `Fetching relations: ${index + parsed.length} fetched`;
     
-                parsed.forEach(async element => {
+                for (let i = 0; i < parsed.length && deleted < document.getElementById('deletion_amount').value; i++) {
+                    let element = parsed[i];                
                     console.log(element);
                     parsedVanityUser = element.navigationUrl.split('in/')[1].split('?')[0]
                     console.log(parsedVanityUser);
-                    if(deleted >= document.getElementById('deletion_amount').value) {
-                        allRelationsFetched = true;
-                        document.getElementById('status').innerText = `Done! Deleted ${deleted} relations`;
-                        return;
-                    }
+                    await new Promise(resolve => setTimeout(resolve, document.getElementById('delay').value));
                     let response2 = await deleteRelations(parsedVanityUser, sessionID);
                     if (response2.status === 403) {
                         document.getElementById('status').innerText = 'Session expired. Please enter a new session ID';
@@ -85,8 +82,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                         document.getElementById('status').innerText = `Failed to delete relation with ${parsedVanityUser}`;
                     }
                     deleted++;
-                });
-                
+                }
+                if(deleted >= document.getElementById('deletion_amount').value) {
+                    allRelationsFetched = true;
+                    document.getElementById('status').innerText = `Done! Deleted ${deleted} relations`;
+                    return;
+                }
                 index += 10;
             } catch (error) {
                 console.error('Error fetching relations:', error);
@@ -96,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     
     async function deleteRelations(parsedVanityUser, sessionID) {
-        await new Promise(resolve => setTimeout(resolve, document.getElementById('delay').value));
         let response = await fetch("https://www.linkedin.com/flagship-web/rsc-action/actions/server-request?sduiid=com.linkedin.sdui.mynetwork.RemoveConnectionId", {
             "credentials": "include",
             "headers": {
