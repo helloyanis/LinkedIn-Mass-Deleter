@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Bulk Delete relations</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <script src="popup.js"></script>
+    <h3>LinkedIn Bulk Delete relations</h3>
+    <div id="status">
+    </div>
+    <div id="status2">
+    </div>
+    <div id="sessionPrompt">
+        <h3>Need to get your session ID!</h3><br>
+        Log in to LinkedIn, open the console (F12), and paste the following code: <br>
+        <code id="session-code">(()=>{if (`; ${document.cookie}`.split(`; JSESSIONID=`).length === 2) return(`; ${document.cookie}`.split(`; JSESSIONID=`).pop().split(';').shift())})()</code>
+        <br>
+        <form id="session-form">
+            <div class="field" style="background-color: #7f00ce;">
+                <label for="session_id">Session ID</label>
+                <input required type="text" id="session_id" name="session_id">
+            </div>
+            <div class="field" style="background-color: #e55800;">
+                <label for="deletion_amount">Amount of relations to delete</label>
+                <input required type="number" min="1" id="deletion_amount" name="deletion_amount">
+            </div>
+            <div class="field" style="background-color: #00cee5;">
+                <label for="delay">Delay in miliseconds (Higher = slower but less detected, Lower = faster but more power-hungry! 0 freezes your browser!)</label>
+                <input required type="number" min="0" value="500" id="delay" name="delay">
+            </div>
+            <div class="field" style="background-color: #00ce00;">
+                <label for="backoff_delay">Back-off delay (For when LinkedIn returns a "429 Too many requests" status code)</label>
+                <input required type="number" min="0" value="60000" id="get_relations_delay" name="get_relations_delay">
+            </div>
+            <input type="submit" id="submit" value="Save">
+        </form>
+    </div>
+
+</body>
+</html>

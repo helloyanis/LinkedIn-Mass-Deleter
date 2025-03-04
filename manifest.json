@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Linkedin Bulk delete relations",
+    "version": "1.0",
+    "description": "Randomly deletes a certain amount of your LinkedIn relations!.",
+    "browser_specific_settings": {
+        "gecko": {
+          "id": "helloyanis@linkedin-bulk-delete-relations"
+        }
+    },
+    "permissions": [
+        "webRequest",
+        "webRequestBlocking",
+        "webRequestFilterResponse",
+        "storage"
+    ],
+    "host_permissions": [
+        "*://*.linkedin.com/voyager/api/graphql*",
+        "*://*.linkedin.com/flagship-web/rsc-action/actions/server-request"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "icon.svg"
+    }
+}
