@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const LS = await browser.storage.local.get()
+    if (LS['JSESSIONID']) {
+        document.getElementById('session_id').value = LS['JSESSIONID']
+    }
     document.getElementById('sessionPrompt').style.display = 'block'
     document.getElementById('session-form').addEventListener('submit', async function (e) {
         e.preventDefault()
@@ -13,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function relationsFetcher(sessionID) {
         document.getElementById('status').innerText = 'Fetching relations...';
         document.getElementById('sessionPrompt').style.display = 'none';
+        document.getElementById('progressContainer').style.display = 'block';
         let index = 0;
         let deleted = 0;
         let allRelationsFetched = false;
@@ -53,7 +57,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     
                 if (parsed.length === 0 || index + parsed.length >= document.getElementById('deletion_amount').value) {
                     allRelationsFetched = true;
-                    document.getElementById('status').innerText = `Done! Fetched ${index + parsed.length} relations`;
                 }
     
                 document.getElementById('status').innerText = `Fetching relations: ${index + parsed.length} fetched`;
@@ -77,15 +80,25 @@ document.addEventListener('DOMContentLoaded', async function () {
                         response2 = await deleteRelations(parsedVanityUser, sessionID);
                     }
                     if(response2.status === 200) {
+                        deleted++;
                         document.getElementById('status').innerText = `Deleted relation with ${parsedVanityUser}`;
+                        const percentage = ((deleted / document.getElementById('deletion_amount').value) * 100).toFixed(2);
+                        if(document.querySelector('.total-progress').querySelector('.progress').style.width != `${percentage}%`){
+                            document.querySelector('.total-progress').querySelector('.progress').style.width = `${percentage}%`;
+                        }
+                        document.querySelector('.total-count').innerText= `Deleted ${deleted}/${document.getElementById('deletion_amount').value} (${percentage}%)`;
+                        document.title = `⏳ ${deleted}/${document.getElementById('deletion_amount').value} (${percentage}%)`;
                     } else {
                         document.getElementById('status').innerText = `Failed to delete relation with ${parsedVanityUser}`;
                     }
-                    deleted++;
+                    
                 }
                 if(deleted >= document.getElementById('deletion_amount').value) {
                     allRelationsFetched = true;
                     document.getElementById('status').innerText = `Done! Deleted ${deleted} relations`;
+                    document.querySelector('.total-progress').querySelector('.progress').style.width = '100%';
+                    document.querySelector('.total-count').innerText= `Deleted ${deleted} relations`;
+                    document.title = `✅ Done!`;
                     return;
                 }
                 index += 10;
@@ -114,4 +127,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
         return response;
     }
+    document.getElementById('session_id').addEventListener('change', async function () {
+        await browser.storage.local.set({ JSESSIONID: this.value })
+    });
 });
